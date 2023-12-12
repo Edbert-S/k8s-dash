@@ -18,6 +18,3 @@
 ## Step 2 Implementation
 - Skooner
     - Disable edit and and delete pemisson for sa binding
-
-## Step 3 Port forward
-- [] Port forward the dashboards
