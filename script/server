@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# script/server: Launch the application and any extra required processes
+#                locally.
+if  [[ $1 == "stop" ]];
+then
+    echo "stopping cluster"
+    minikube stop;
+    echo "cluster stopped"
+elif [[ $1 == "start" ]] ;
+then
+    echo "starting cluster"
+    minikube start;
+else
+    echo "invalid args: \"start\" or \"stop\" is required";
+fi

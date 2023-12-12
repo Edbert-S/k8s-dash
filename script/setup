@@ -1,0 +1,39 @@
+#!/bin/sh
+
+# script/setup: Set up application for the first time after cloning, or set it
+#               back to the initial first unused state.
+
+script/bootstrap
+# Start cluster
+script/server start
+
+echo deploying web server
+kubectl create deployment hello-node --image=registry.k8s.io/e2e-test-images/agnhost:2.39 -- /agnhost netexec --http-port=8080
+
+echo deploying metric server
+kubectl apply -f https://github.com/kubernetes-sigs/metrics-server/releases/latest/download/components.yaml
+
+echo deploying dashboards
+echo -------------------------- Kubevious ---------------------------------
+kubectl create namespace kubevious
+helm repo add kubevious https://helm.kubevious.io
+helm upgrade --atomic -i kubevious kubevious/kubevious --version 1.2.1 -n kubevious
+
+echo --------------------------  Skooner  --------------------------------
+kubectl apply -f dashboard/skooner.yaml
+kubectl create serviceaccount skooner-sa
+kubectl create clusterrolebinding skooner-sa --clusterrole=cluster-admin --serviceaccount=default:skooner-sa
+touch token/skooner.txt
+kubectl create token skooner-sa >> token/skooner.txt
+
+echo -------------------------- Headlamp ---------------------------------
+kubectl apply -f https://raw.githubusercontent.com/kinvolk/headlamp/main/kubernetes-headlamp.yaml
+kubectl -n kube-system create serviceaccount headlamp-admin
+kubectl create clusterrolebinding headlamp-admin --serviceaccount=kube-system:headlamp-admin --clusterrole=cluster-admin
+touch token/headlamp.txt
+kubectl create token headlamp-admin -n kube-system >> token/headlamp.txt
+
+echo -------------------------- K8sDash -----------------------------------
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+# Stop cluster
+script/server stop
