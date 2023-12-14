@@ -9,7 +9,6 @@
 - [x] Install Skooner
 - [x] Install kube dashboard
 - [x] Install Kubevious
-- [x] Install Loft Dashboard
 
 ## Step 1 Research
 - [x] Research the basics of kubernetes

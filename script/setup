@@ -24,16 +24,26 @@ kubectl apply -f dashboard/skooner.yaml
 kubectl create serviceaccount skooner-sa
 kubectl create clusterrolebinding skooner-sa --clusterrole=cluster-admin --serviceaccount=default:skooner-sa
 touch token/skooner.txt
-kubectl create token skooner-sa >> token/skooner.txt
+kubectl create token skooner-sa > token/skooner.txt
 
-echo -------------------------- Headlamp ---------------------------------
-kubectl apply -f https://raw.githubusercontent.com/kinvolk/headlamp/main/kubernetes-headlamp.yaml
-kubectl -n kube-system create serviceaccount headlamp-admin
-kubectl create clusterrolebinding headlamp-admin --serviceaccount=kube-system:headlamp-admin --clusterrole=cluster-admin
-touch token/headlamp.txt
-kubectl create token headlamp-admin -n kube-system >> token/headlamp.txt
+# echo -------------------------- Headlamp ---------------------------------
+# helm repo add headlamp https://headlamp-k8s.github.io/headlamp/
+# helm install my-headlamp headlamp/headlamp --namespace kube-system
+# kubectl apply -f https://raw.githubusercontent.com/kinvolk/headlamp/main/kubernetes-headlamp.yaml
+# kubectl apply -f https://raw.githubusercontent.com/kinvolk/headlamp/main/kubernetes-headlamp-ingress-sample.yaml
+ 
+# kubectl -n kube-system create serviceaccount headlamp-admin
+# kubectl create clusterrolebinding headlamp-admin --serviceaccount=kube-system:headlamp-admin --clusterrole=cluster-admin
+# touch token/headlamp.txt
+# kubectl create token headlamp-admin -n kube-system > token/headlamp.txt
 
 echo -------------------------- K8sDash -----------------------------------
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+
+kubectl -n kube-system create serviceaccount k8sdash-admin
+kubectl create clusterrolebinding k8sdash-admin --serviceaccount=kube-system:k8sdash-admin --clusterrole=cluster-admin
+touch token/k8sdash.txt
+kubectl create token k8sdash-admin -n kube-system > token/k8sdash.txt
+
 # Stop cluster
 script/server stop
